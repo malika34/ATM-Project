@@ -4,7 +4,6 @@ import chalk from "chalk"; // Importing the chalk library for styling console ou
 // Initializing variables
 let myBalance = 200000; // Dollar
 let myPinCode = 1122; // Predefined PIN code
-let fastCash = 15000; // Predefined fast cash limit
 // Prompting the user to enter their PIN code
 let pinAnswer = await inquirer.prompt([
     {
@@ -50,17 +49,26 @@ if (pinAnswer.pin === myPinCode) {
         console.log(chalk.yellow(`Your balance is: ${myBalance}`)); // Styling message with chalk
     }
     else if (operationAnwers.operations === "Fastcash") {
-        // If user chooses fast cash, check if balance is sufficient
-        if (myBalance >= fastCash) {
-            // If balance is sufficient, withdraw fast cash
-            myBalance -= fastCash;
-            console.log(chalk.green(`You have withdrawn ${fastCash} using fastcash. Your remaining balance is ${myBalance}`)); // Styling message with chalk
+        // If user chooses fastcash, prompt for fastcash amount
+        let fastCash = await inquirer.prompt([
+            {
+                name: "amount",
+                type: "list",
+                message: "Please select your fastcash amount",
+                choices: [5000, 10000, 20000, 25000]
+            }
+        ]);
+        // Check if fastcash amount exceeds balance
+        if (fastCash.amount > myBalance) {
+            console.log(chalk.red("Insufficient funds. Please enter a smaller amount."));
         }
-        else {
-            // If balance is insufficient, display error message
-            console.log(chalk.red("Insufficient funds. Please enter a smaller amount.")); // Styling message with chalk
-        }
-        ;
+        // Deduct fastcash amount from balance
+        myBalance -= fastCash.amount;
+        console.log(`You have withdrawn ${fastCash.amount} using fastcash. Your remaining balance is ${myBalance}`);
+    }
+    else {
+        // If balance is insufficient, display error message
+        console.log(chalk.red("Insufficient funds. Please enter a smaller amount.")); // Styling message with chalk
     }
     ;
 }
